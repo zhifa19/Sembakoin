@@ -1,0 +1,9 @@
+body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: white; color: #800000; }
+header, footer { background-color: #800000; color: white; text-align: center; padding: 1em 0; }
+.slider { display: flex; align-items: center; justify-content: center; margin: 20px 0; overflow: hidden; position: relative; }
+.slides { display: flex; transition: transform 0.3s ease-in-out; }
+.slide { min-width: 300px; margin: 0 10px; text-align: center; border: 1px solid #800000; padding: 10px; border-radius: 10px; }
+button { background-color: #800000; color: white; border: none; padding: 5px 10px; margin-top: 10px; cursor: pointer; border-radius: 5px; }
+button:hover { background-color: #b22222; }
+.cart-section, .testimoni, .feedback { margin: 20px; padding: 20px; border: 1px solid #800000; border-radius: 10px; }
+input, textarea { width: 100%; margin: 5px 0; padding: 5px; }
