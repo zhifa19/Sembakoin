@@ -1,528 +1,282 @@
-/* ===================================================================
- * Mueller 1.0.0 - Main JS
- *
- * ------------------------------------------------------------------- */
 
-(function(html) {
+(function ($) {
+    "use strict";
 
-    'use strict';
+    /*[ Load page ]
+    ===========================================================*/
+    $(".animsition").animsition({
+        inClass: 'fade-in',
+        outClass: 'fade-out',
+        inDuration: 1500,
+        outDuration: 800,
+        linkElement: '.animsition-link',
+        loading: true,
+        loadingParentElement: 'html',
+        loadingClass: 'animsition-loading-1',
+        loadingInner: '<div class="loader05"></div>',
+        timeout: false,
+        timeoutCountdown: 5000,
+        onLoadEvent: true,
+        browser: [ 'animation-duration', '-webkit-animation-duration'],
+        overlay : false,
+        overlayClass : 'animsition-overlay-slide',
+        overlayParentElement : 'html',
+        transition: function(url){ window.location.href = url; }
+    });
+    
+    /*[ Back to top ]
+    ===========================================================*/
+    var windowH = $(window).height()/2;
 
-    const cfg = {
-        
-        // MailChimp URL
-        mailChimpURL : 'https://facebook.us1.list-manage.com/subscribe/post?u=1abf75f6981256963a47d197a&amp;id=37c6d8f4d6' 
-
-    };
-
-
-   /* preloader
-    * -------------------------------------------------- */
-    const ssPreloader = function() {
-
-        const siteBody = document.querySelector('body');
-        const preloader = document.querySelector('#preloader');
-        if (!preloader) return;
-
-        html.classList.add('ss-preload');
-        
-        window.addEventListener('load', function() {
-            html.classList.remove('ss-preload');
-            html.classList.add('ss-loaded');
-
-            preloader.addEventListener('transitionend', function afterTransition(e) {
-                if (e.target.matches('#preloader'))  {
-                    siteBody.classList.add('ss-show');
-                    e.target.style.display = 'none';
-                    preloader.removeEventListener(e.type, afterTransition);
-                }
-            });
-        });
-
-        // window.addEventListener('beforeunload' , function() {
-        //     siteBody.classList.remove('ss-show');
-        // });
-
-    }; // end ssPreloader
-
-
-   /* move header
-    * -------------------------------------------------- */
-    const ssMoveHeader = function () {
-
-        const hdr = document.querySelector('.s-header');
-        const hero = document.querySelector('#intro');
-        let triggerHeight;
-
-        if (!(hdr && hero)) return;
-
-        setTimeout(function() {
-            triggerHeight = hero.offsetHeight - 170;
-        }, 300);
-
-        window.addEventListener('scroll', function () {
-
-            let loc = window.scrollY;
-
-            if (loc > triggerHeight) {
-                hdr.classList.add('sticky');
-            } else {
-                hdr.classList.remove('sticky');
-            }
-
-            if (loc > triggerHeight + 20) {
-                hdr.classList.add('offset');
-            } else {
-                hdr.classList.remove('offset');
-            }
-
-            if (loc > triggerHeight + 150) {
-                hdr.classList.add('scrolling');
-            } else {
-                hdr.classList.remove('scrolling');
-            }
-
-        });
-
-    }; // end ssMoveHeader
-
-
-   /* mobile menu
-    * ---------------------------------------------------- */ 
-    const ssMobileMenu = function() {
-
-        const toggleButton = document.querySelector('.s-header__menu-toggle');
-        const mainNavWrap = document.querySelector('.s-header__nav');
-        const siteBody = document.querySelector('body');
-
-        if (!(toggleButton && mainNavWrap)) return;
-
-        toggleButton.addEventListener('click', function(event) {
-            event.preventDefault();
-            toggleButton.classList.toggle('is-clicked');
-            siteBody.classList.toggle('menu-is-open');
-        });
-
-        mainNavWrap.querySelectorAll('.s-header__nav a').forEach(function(link) {
-
-            link.addEventListener("click", function(event) {
-
-                // at 800px and below
-                if (window.matchMedia('(max-width: 800px)').matches) {
-                    toggleButton.classList.toggle('is-clicked');
-                    siteBody.classList.toggle('menu-is-open');
-                }
-            });
-        });
-
-        window.addEventListener('resize', function() {
-
-            // above 800px
-            if (window.matchMedia('(min-width: 801px)').matches) {
-                if (siteBody.classList.contains('menu-is-open')) siteBody.classList.remove('menu-is-open');
-                if (toggleButton.classList.contains('is-clicked')) toggleButton.classList.remove('is-clicked');
-            }
-        });
-
-    }; // end ssMobileMenu
-
-
-    /* highlight active menu link on pagescroll
-    * ------------------------------------------------------ */
-    const ssScrollSpy = function() {
-
-        const sections = document.querySelectorAll('.target-section');
-
-        // Add an event listener listening for scroll
-        window.addEventListener('scroll', navHighlight);
-
-        function navHighlight() {
-        
-            // Get current scroll position
-            let scrollY = window.pageYOffset;
-        
-            // Loop through sections to get height(including padding and border), 
-            // top and ID values for each
-            sections.forEach(function(current) {
-                const sectionHeight = current.offsetHeight;
-                const sectionTop = current.offsetTop - 50;
-                const sectionId = current.getAttribute('id');
-            
-               /* If our current scroll position enters the space where current section 
-                * on screen is, add .current class to parent element(li) of the thecorresponding 
-                * navigation link, else remove it. To know which link is active, we use 
-                * sectionId variable we are getting while looping through sections as 
-                * an selector
-                */
-                if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
-                    document.querySelector('.s-header__nav a[href*=' + sectionId + ']').parentNode.classList.add('current');
-                } else {
-                    document.querySelector('.s-header__nav a[href*=' + sectionId + ']').parentNode.classList.remove('current');
-                }
-            });
+    $(window).on('scroll',function(){
+        if ($(this).scrollTop() > windowH) {
+            $("#myBtn").css('display','flex');
+        } else {
+            $("#myBtn").css('display','none');
         }
+    });
 
-    }; // end ssScrollSpy
-
-
-   /* masonry
-    * ------------------------------------------------------ */
-     const ssMasonry = function() {
-
-        const containerBricks = document.querySelector('.bricks-wrapper');
-        if (!containerBricks) return;
-
-        imagesLoaded(containerBricks, function() {
-
-            const msnry = new Masonry(containerBricks, {
-                itemSelector: '.entry',
-                columnWidth: '.grid-sizer',
-                percentPosition: true,
-                resize: true
-            });
-
-        });
-
-    }; // end ssMasonry
+    $('#myBtn').on("click", function(){
+        $('html, body').animate({scrollTop: 0}, 300);
+    });
 
 
-   /* swiper
-    * ------------------------------------------------------ */ 
-    const ssSwiper = function() {
+    /*==================================================================
+    [ Fixed Header ]*/
+    var headerDesktop = $('.container-menu-desktop');
+    var wrapMenu = $('.wrap-menu-desktop');
 
-        const testimonialsSwiper = new Swiper('.s-testimonials__slider', {
-
-            slidesPerView: 1,
-            pagination: {
-                el: '.swiper-pagination',
-                clickable: true,
-            },
-            breakpoints: {
-                // when window width is > 400px
-                401: {
-                    slidesPerView: 1,
-                    spaceBetween: 20
-                },
-                // when window width is > 800px
-                801: {
-                    slidesPerView: 2,
-                    spaceBetween: 50
-                },
-                // when window width is > 1180px
-                1181: {
-                    slidesPerView: 2,
-                    spaceBetween: 100
-                }
-            }
-        });
-
-    }; // end ssSwiper
-
-
-   /* mailchimp form
-    * ---------------------------------------------------- */ 
-    const ssMailChimpForm = function() {
-
-        const mcForm = document.querySelector('#mc-form');
-
-        if (!mcForm) return;
-
-        // Add novalidate attribute
-        mcForm.setAttribute('novalidate', true);
-
-        // Field validation
-        function hasError(field) {
-
-            // Don't validate submits, buttons, file and reset inputs, and disabled fields
-            if (field.disabled || field.type === 'file' || field.type === 'reset' || field.type === 'submit' || field.type === 'button') return;
-
-            // Get validity
-            let validity = field.validity;
-
-            // If valid, return null
-            if (validity.valid) return;
-
-            // If field is required and empty
-            if (validity.valueMissing) return 'Please enter an email address.';
-
-            // If not the right type
-            if (validity.typeMismatch) {
-                if (field.type === 'email') return 'Please enter a valid email address.';
-            }
-
-            // If pattern doesn't match
-            if (validity.patternMismatch) {
-
-                // If pattern info is included, return custom error
-                if (field.hasAttribute('title')) return field.getAttribute('title');
-
-                // Otherwise, generic error
-                return 'Please match the requested format.';
-            }
-
-            // If all else fails, return a generic catchall error
-            return 'The value you entered for this field is invalid.';
-
-        };
-
-        // Show error message
-        function showError(field, error) {
-
-            // Get field id or name
-            let id = field.id || field.name;
-            if (!id) return;
-
-            let errorMessage = field.form.querySelector('.mc-status');
-
-            // Update error message
-            errorMessage.classList.remove('success-message');
-            errorMessage.classList.add('error-message');
-            errorMessage.innerHTML = error;
-
-        };
-
-        // Display form status (callback function for JSONP)
-        window.displayMailChimpStatus = function (data) {
-
-            // Make sure the data is in the right format and that there's a status container
-            if (!data.result || !data.msg || !mcStatus ) return;
-
-            // Update our status message
-            mcStatus.innerHTML = data.msg;
-
-            // If error, add error class
-            if (data.result === 'error') {
-                mcStatus.classList.remove('success-message');
-                mcStatus.classList.add('error-message');
-                return;
-            }
-
-            // Otherwise, add success class
-            mcStatus.classList.remove('error-message');
-            mcStatus.classList.add('success-message');
-        };
-
-        // Submit the form 
-        function submitMailChimpForm(form) {
-
-            let url = cfg.mailChimpURL;
-            let emailField = form.querySelector('#mce-EMAIL');
-            let serialize = '&' + encodeURIComponent(emailField.name) + '=' + encodeURIComponent(emailField.value);
-
-            if (url == '') return;
-
-            url = url.replace('/post?u=', '/post-json?u=');
-            url += serialize + '&c=displayMailChimpStatus';
-
-            // Create script with url and callback (if specified)
-            var ref = window.document.getElementsByTagName( 'script' )[ 0 ];
-            var script = window.document.createElement( 'script' );
-            script.src = url;
-
-            // Create global variable for the status container
-            window.mcStatus = form.querySelector('.mc-status');
-            window.mcStatus.classList.remove('error-message', 'success-message')
-            window.mcStatus.innerText = 'Submitting...';
-
-            // Insert script tag into the DOM
-            ref.parentNode.insertBefore( script, ref );
-
-            // After the script is loaded (and executed), remove it
-            script.onload = function () {
-                this.remove();
-            };
-
-        };
-
-        // Check email field on submit
-        mcForm.addEventListener('submit', function (event) {
-
-            event.preventDefault();
-
-            let emailField = event.target.querySelector('#mce-EMAIL');
-            let error = hasError(emailField);
-
-            if (error) {
-                showError(emailField, error);
-                emailField.focus();
-                return;
-            }
-
-            submitMailChimpForm(this);
-
-        }, false);
-
-    }; // end ssMailChimpForm
-
-
-   /* Lightbox
-    * ------------------------------------------------------ */
-    const ssLightbox = function() {
-
-        // video lightbox
-        const videoLightbox = function() {
-
-            const videoLink = document.querySelector('.s-intro__content-video-btn');
-            if (!videoLink) return;
+    if($('.top-bar').length > 0) {
+        var posWrapHeader = $('.top-bar').height();
+    }
+    else {
+        var posWrapHeader = 0;
+    }
     
-            videoLink.addEventListener('click', function(event) {
-    
-                const vLink = this.getAttribute('href');
-                const iframe = "<iframe src='" + vLink + "' frameborder='0'></iframe>";
-    
-                event.preventDefault();
-    
-                const instance = basicLightbox.create(iframe);
-                instance.show()
-    
-            });
-    
-        };
 
-        // portfolio lightbox
-        const folioLightbox = function() {
+    if($(window).scrollTop() > posWrapHeader) {
+        $(headerDesktop).addClass('fix-menu-desktop');
+        $(wrapMenu).css('top',0); 
+    }  
+    else {
+        $(headerDesktop).removeClass('fix-menu-desktop');
+        $(wrapMenu).css('top',posWrapHeader - $(this).scrollTop()); 
+    }
 
-            const folioLinks = document.querySelectorAll('.brick .entry__link');
-            const modals = [];
-    
-            folioLinks.forEach(function(link) {
-                let modalbox = link.getAttribute('href');
-                let instance = basicLightbox.create(
-                    document.querySelector(modalbox),
-                    {
-                        onShow: function(instance) {
-                            //detect Escape key press
-                            document.addEventListener("keydown", function(event) {
-                                event = event || window.event;
-                                if (event.key === "Escape") {
-                                    instance.close();
-                                }
-                            });
-                        }
-                    }
-                )
-                modals.push(instance);
-            });
-    
-            folioLinks.forEach(function(link, index) {
-                link.addEventListener("click", function(event) {
-                    event.preventDefault();
-                    modals[index].show();
-                });
-            });
-    
-        };
-
-        videoLightbox();
-        folioLightbox();
-
-    }; // ssLightbox
+    $(window).on('scroll',function(){
+        if($(this).scrollTop() > posWrapHeader) {
+            $(headerDesktop).addClass('fix-menu-desktop');
+            $(wrapMenu).css('top',0); 
+        }  
+        else {
+            $(headerDesktop).removeClass('fix-menu-desktop');
+            $(wrapMenu).css('top',posWrapHeader - $(this).scrollTop()); 
+        } 
+    });
 
 
-   /* alert boxes
-    * ------------------------------------------------------ */
-    const ssAlertBoxes = function() {
+    /*==================================================================
+    [ Menu mobile ]*/
+    $('.btn-show-menu-mobile').on('click', function(){
+        $(this).toggleClass('is-active');
+        $('.menu-mobile').slideToggle();
+    });
 
-        const boxes = document.querySelectorAll('.alert-box');
-  
-        boxes.forEach(function(box){
+    var arrowMainMenu = $('.arrow-main-menu-m');
 
-            box.addEventListener('click', function(event) {
-                if (event.target.matches('.alert-box__close')) {
-                    event.stopPropagation();
-                    event.target.parentElement.classList.add('hideit');
-
-                    setTimeout(function(){
-                        box.style.display = 'none';
-                    }, 500)
-                }
-            });
+    for(var i=0; i<arrowMainMenu.length; i++){
+        $(arrowMainMenu[i]).on('click', function(){
+            $(this).parent().find('.sub-menu-m').slideToggle();
+            $(this).toggleClass('turn-arrow-main-menu-m');
         })
+    }
 
-    }; // end ssAlertBoxes
-
-
-    /* Back to Top
-    * ------------------------------------------------------ */
-    const ssBackToTop = function() {
-
-        const pxShow = 900;
-        const goTopButton = document.querySelector(".ss-go-top");
-
-        if (!goTopButton) return;
-
-        // Show or hide the button
-        if (window.scrollY >= pxShow) goTopButton.classList.add("link-is-visible");
-
-        window.addEventListener('scroll', function() {
-            if (window.scrollY >= pxShow) {
-                if(!goTopButton.classList.contains('link-is-visible')) goTopButton.classList.add("link-is-visible")
-            } else {
-                goTopButton.classList.remove("link-is-visible")
+    $(window).resize(function(){
+        if($(window).width() >= 992){
+            if($('.menu-mobile').css('display') == 'block') {
+                $('.menu-mobile').css('display','none');
+                $('.btn-show-menu-mobile').toggleClass('is-active');
             }
-        });
 
-    }; // end ssBackToTop
-
-
-   /* smoothscroll
-    * ------------------------------------------------------ */
-    const ssMoveTo = function(){
-
-        const easeFunctions = {
-            easeInQuad: function (t, b, c, d) {
-                t /= d;
-                return c * t * t + b;
-            },
-            easeOutQuad: function (t, b, c, d) {
-                t /= d;
-                return -c * t* (t - 2) + b;
-            },
-            easeInOutQuad: function (t, b, c, d) {
-                t /= d/2;
-                if (t < 1) return c/2*t*t + b;
-                t--;
-                return -c/2 * (t*(t-2) - 1) + b;
-            },
-            easeInOutCubic: function (t, b, c, d) {
-                t /= d/2;
-                if (t < 1) return c/2*t*t*t + b;
-                t -= 2;
-                return c/2*(t*t*t + 2) + b;
-            }
+            $('.sub-menu-m').each(function(){
+                if($(this).css('display') == 'block') { console.log('hello');
+                    $(this).css('display','none');
+                    $(arrowMainMenu).removeClass('turn-arrow-main-menu-m');
+                }
+            });
+                
         }
+    });
 
-        const triggers = document.querySelectorAll('.smoothscroll');
+
+    /*==================================================================
+    [ Show / hide modal search ]*/
+    $('.js-show-modal-search').on('click', function(){
+        $('.modal-search-header').addClass('show-modal-search');
+        $(this).css('opacity','0');
+    });
+
+    $('.js-hide-modal-search').on('click', function(){
+        $('.modal-search-header').removeClass('show-modal-search');
+        $('.js-show-modal-search').css('opacity','1');
+    });
+
+    $('.container-search-header').on('click', function(e){
+        e.stopPropagation();
+    });
+
+
+    /*==================================================================
+    [ Isotope ]*/
+    var $topeContainer = $('.isotope-grid');
+    var $filter = $('.filter-tope-group');
+
+    // filter items on button click
+    $filter.each(function () {
+        $filter.on('click', 'button', function () {
+            var filterValue = $(this).attr('data-filter');
+            $topeContainer.isotope({filter: filterValue});
+        });
         
-        const moveTo = new MoveTo({
-            tolerance: 0,
-            duration: 1200,
-            easing: 'easeInOutCubic',
-            container: window
-        }, easeFunctions);
+    });
 
-        triggers.forEach(function(trigger) {
-            moveTo.registerTrigger(trigger);
+    // init Isotope
+    $(window).on('load', function () {
+        var $grid = $topeContainer.each(function () {
+            $(this).isotope({
+                itemSelector: '.isotope-item',
+                layoutMode: 'fitRows',
+                percentPosition: true,
+                animationEngine : 'best-available',
+                masonry: {
+                    columnWidth: '.isotope-item'
+                }
+            });
+        });
+    });
+
+    var isotopeButton = $('.filter-tope-group button');
+
+    $(isotopeButton).each(function(){
+        $(this).on('click', function(){
+            for(var i=0; i<isotopeButton.length; i++) {
+                $(isotopeButton[i]).removeClass('how-active1');
+            }
+
+            $(this).addClass('how-active1');
+        });
+    });
+
+    /*==================================================================
+    [ Filter / Search product ]*/
+    $('.js-show-filter').on('click',function(){
+        $(this).toggleClass('show-filter');
+        $('.panel-filter').slideToggle(400);
+
+        if($('.js-show-search').hasClass('show-search')) {
+            $('.js-show-search').removeClass('show-search');
+            $('.panel-search').slideUp(400);
+        }    
+    });
+
+    $('.js-show-search').on('click',function(){
+        $(this).toggleClass('show-search');
+        $('.panel-search').slideToggle(400);
+
+        if($('.js-show-filter').hasClass('show-filter')) {
+            $('.js-show-filter').removeClass('show-filter');
+            $('.panel-filter').slideUp(400);
+        }    
+    });
+
+
+
+
+    /*==================================================================
+    [ Cart ]*/
+    $('.js-show-cart').on('click',function(){
+        $('.js-panel-cart').addClass('show-header-cart');
+    });
+
+    $('.js-hide-cart').on('click',function(){
+        $('.js-panel-cart').removeClass('show-header-cart');
+    });
+
+    /*==================================================================
+    [ Cart ]*/
+    $('.js-show-sidebar').on('click',function(){
+        $('.js-sidebar').addClass('show-sidebar');
+    });
+
+    $('.js-hide-sidebar').on('click',function(){
+        $('.js-sidebar').removeClass('show-sidebar');
+    });
+
+    /*==================================================================
+    [ +/- num product ]*/
+    $('.btn-num-product-down').on('click', function(){
+        var numProduct = Number($(this).next().val());
+        if(numProduct > 0) $(this).next().val(numProduct - 1);
+    });
+
+    $('.btn-num-product-up').on('click', function(){
+        var numProduct = Number($(this).prev().val());
+        $(this).prev().val(numProduct + 1);
+    });
+
+    /*==================================================================
+    [ Rating ]*/
+    $('.wrap-rating').each(function(){
+        var item = $(this).find('.item-rating');
+        var rated = -1;
+        var input = $(this).find('input');
+        $(input).val(0);
+
+        $(item).on('mouseenter', function(){
+            var index = item.index(this);
+            var i = 0;
+            for(i=0; i<=index; i++) {
+                $(item[i]).removeClass('zmdi-star-outline');
+                $(item[i]).addClass('zmdi-star');
+            }
+
+            for(var j=i; j<item.length; j++) {
+                $(item[j]).addClass('zmdi-star-outline');
+                $(item[j]).removeClass('zmdi-star');
+            }
         });
 
-    }; // end ssMoveTo
+        $(item).on('click', function(){
+            var index = item.index(this);
+            rated = index;
+            $(input).val(index+1);
+        });
+
+        $(this).on('mouseleave', function(){
+            var i = 0;
+            for(i=0; i<=rated; i++) {
+                $(item[i]).removeClass('zmdi-star-outline');
+                $(item[i]).addClass('zmdi-star');
+            }
+
+            for(var j=i; j<item.length; j++) {
+                $(item[j]).addClass('zmdi-star-outline');
+                $(item[j]).removeClass('zmdi-star');
+            }
+        });
+    });
+    
+    /*==================================================================
+    [ Show modal1 ]*/
+    $('.js-show-modal1').on('click',function(e){
+        e.preventDefault();
+        $('.js-modal1').addClass('show-modal1');
+    });
+
+    $('.js-hide-modal1').on('click',function(){
+        $('.js-modal1').removeClass('show-modal1');
+    });
 
 
-   /* Initialize
-    * ------------------------------------------------------ */
-    (function ssInit() {
 
-        ssPreloader();
-        ssMoveHeader();
-        ssMobileMenu();
-        ssScrollSpy();
-        ssMasonry();
-        ssSwiper();
-        ssMailChimpForm();
-        ssLightbox();
-        ssAlertBoxes();
-        ssBackToTop();
-        ssMoveTo();
-
-    })();
-
-})(document.documentElement);
+})(jQuery);
